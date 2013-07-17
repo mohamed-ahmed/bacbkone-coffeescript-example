@@ -15,14 +15,48 @@ jQuery ->
 		id: 'boarder'
 
 		initialize: ->
-			_.bindAll @
+	      _.bindAll @
+	      
+	      @model.bind 'change', @render
+	      @model.bind 'remove', @unrender
 
-		render: ->
-			$(@el).html "<div id='list-item'>#{@model.get 'part1'} #{@model.get 'part2'}!</div>"
-			$(@el).slideUp("slow");
-			$(@el).slideDown("slow");
+		###render: -> 
+			$(@el).html """
+				<div id='list-item'>#{@model.get 'part1'} #{@model.get 'part2'}!
+				<span class="swap">swap</span>
+				<span class="delete">delete</span></div>
+			"""
+			# $(@el).slideUp("slow");
+			# $(@el).slideDown("slow");
 			console.log @
-			@
+			@###
+
+		render: =>
+	      $(@el).html """
+	      	<div id='list-item'>
+	        <span>#{@model.get 'part1'} #{@model.get 'part2'}!</span>
+	        <span class="swap">swap</span>
+	        <span class="delete">delete</span>
+	        </div>
+	      """
+	      @
+
+
+
+		unrender: =>
+      		$(@el).remove()
+
+		swap:->
+			@model.set
+				part1: @model.get 'part2'
+				part2: @model.get 'part1'
+
+		remove:->
+			@model.destroy()
+
+		events:
+	      'click .swap': 'swap'
+	      'click .delete': 'remove'
 
 	class ListView extends Backbone.View
 
@@ -54,6 +88,9 @@ jQuery ->
 			$('ul').append item_view.render().el
 
 		events: 'click button': 'addItem'
+
+	Backbone.sync = (method, model, success, error) ->
+		success()
 
 	list_view = new ListView
 		
